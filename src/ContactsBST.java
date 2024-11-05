@@ -4,104 +4,90 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class ContactsBST {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        ContactsBST contactsTree = new ContactsBST();  
+    private Node root; // Root of the BST
 
-        // Load contacts from file
-        String fileName;
-        boolean fileLoaded = false;
-        do {
-            System.out.print("Enter file name: ");
-            fileName = scanner.nextLine();
-            fileLoaded = readContactsFromFile(fileName, contactsTree);
-            if (!fileLoaded) {
-                System.out.println("File not found or empty. Please try again.");
-            }
-        } while (!fileLoaded);
+    // Inner class to represent a node in the BST
+    private class Node {
+        Contact contact;
+        Node left, right;
 
-        // Display menu options in a loop for user interaction
-
-        while (true) {
-            System.out.println("Contact List");
-            System.out.println("Select one of the following operations:");
-            System.out.println("1. Add a contact");
-            System.out.println("2. Remove a contact");
-            System.out.println("3. Display contacts in alphabetic order");
-            System.out.println("4. Search a contact");
-            System.out.println("5. Exit");
-
-            // Get user's menu choice and perform corresponding action
-            System.out.print("Enter your selection here: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();  
-
-            switch (choice) {
-                case 1: // Add a new contact by getting name and phone number from user
-
-                    System.out.print("Enter new contact name: ");
-                    String newName = scanner.nextLine().trim();
-                    System.out.print("Enter new contact number: ");
-                    String newPhone = scanner.nextLine().trim();
-                    contactsTree.insert(new Contact(newName, newPhone));
-                    System.out.println("Contact added.");
-                    break;
-                case 2: // Remove a contact by name
-
-                    System.out.print("Enter contact name to remove: ");
-                    String removeName = scanner.nextLine().trim();
-                    contactsTree.remove(removeName);
-                    System.out.println("Contact removed (if it existed).");
-                    break;
-                case 3: // Display all contacts in alphabetical order
-
-                    System.out.println("Contact List:");
-                    contactsTree.printInOrder();
-                    break;
-                case 4:  // Search for a specific contact by name
-
-                    System.out.print("Enter contact name to search: ");
-                    String searchName = scanner.nextLine().trim();
-                    Contact foundContact = contactsTree.search(searchName);
-                    if (foundContact != null) {
-                        System.out.println("Found: " + foundContact);
-                    } else {
-                        System.out.println("Contact not found.");
-                    }
-                    break;
-                case 5: // Exit the program
-
-                    System.out.println("Goodbye!");
-                    return;
-                default:  // Handle invalid menu input
-
-                    System.out.println("Invalid selection. Please try again.");
-            }
+        Node(Contact contact) {
+            this.contact = contact;
         }
     }
 
-    Contact search(String searchName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    // Insert a new contact into the BST
+    public void insert(Contact contact) {
+        root = insertRec(root, contact);
+    }
 
-	void printInOrder() {
-		// TODO Auto-generated method stub
-		
-	}
+    private Node insertRec(Node node, Contact contact) {
+        if (node == null) {
+            return new Node(contact);
+        }
+        if (contact.compareTo(node.contact) < 0) {
+            node.left = insertRec(node.left, contact);
+        } else if (contact.compareTo(node.contact) > 0) {
+            node.right = insertRec(node.right, contact);
+        }
+        return node;
+    }
 
-	void remove(String removeName) {
-		// TODO Auto-generated method stub
-		
-	}
+    // Search for a contact by name
+    public Contact search(String name) {
+        return searchRec(root, name);
+    }
 
-	void insert(Contact contact) {
-		// TODO Auto-generated method stub
-		
-	}
+    private Contact searchRec(Node node, String name) {
+        if (node == null) return null;
+        if (name.equalsIgnoreCase(node.contact.getName())) return node.contact;
+        if (name.compareToIgnoreCase(node.contact.getName()) < 0) return searchRec(node.left, name);
+        return searchRec(node.right, name);
+    }
 
-	// Helper method to read contacts from file and insert into ContactsBST
-    private static boolean readContactsFromFile(String fileName, ContactsBST contactsTree) {
+    // Remove a contact by name
+    public void remove(String name) {
+        root = removeRec(root, name);
+    }
+
+    private Node removeRec(Node node, String name) {
+        if (node == null) return null;
+
+        if (name.compareToIgnoreCase(node.contact.getName()) < 0) {
+            node.left = removeRec(node.left, name);
+        } else if (name.compareToIgnoreCase(node.contact.getName()) > 0) {
+            node.right = removeRec(node.right, name);
+        } else {
+            // Node to be deleted found
+            if (node.left == null) return node.right;
+            if (node.right == null) return node.left;
+            Node minNode = findMin(node.right);
+            node.contact = minNode.contact;
+            node.right = removeRec(node.right, minNode.contact.getName());
+        }
+        return node;
+    }
+
+    private Node findMin(Node node) {
+        while (node.left != null) node = node.left;
+        return node;
+    }
+
+    // Print contacts in alphabetical order
+    public void printInOrder() {
+        printInOrderRec(root);
+    }
+
+    private void printInOrderRec(Node node) {
+        if (node != null) {
+            printInOrderRec(node.left);
+            System.out.println(node.contact);
+            printInOrderRec(node.right);
+        }
+    }
+
+    // Helper method to read contacts from file and insert into ContactsBST
+    public static boolean readContactsFromFile(String fileName, ContactsBST contactsTree) {
         boolean fileNotEmpty = false;
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -120,4 +106,5 @@ public class ContactsBST {
         return fileNotEmpty;
     }
 }
+
 
