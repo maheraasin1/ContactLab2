@@ -20,7 +20,8 @@ public class ContactsBST {
             }
         } while (!fileLoaded);
 
-        // Menu loop
+        // Display menu options in a loop for user interaction
+
         while (true) {
             System.out.println("Contact List");
             System.out.println("Select one of the following operations:");
@@ -30,12 +31,14 @@ public class ContactsBST {
             System.out.println("4. Search a contact");
             System.out.println("5. Exit");
 
+            // Get user's menu choice and perform corresponding action
             System.out.print("Enter your selection here: ");
             int choice = scanner.nextInt();
-            scanner.nextLine();  // Consume newline
+            scanner.nextLine();  
 
             switch (choice) {
-                case 1:
+                case 1: // Add a new contact by getting name and phone number from user
+
                     System.out.print("Enter new contact name: ");
                     String newName = scanner.nextLine().trim();
                     System.out.print("Enter new contact number: ");
@@ -43,17 +46,20 @@ public class ContactsBST {
                     contactsTree.insert(new Contact(newName, newPhone));
                     System.out.println("Contact added.");
                     break;
-                case 2:
+                case 2: // Remove a contact by name
+
                     System.out.print("Enter contact name to remove: ");
                     String removeName = scanner.nextLine().trim();
                     contactsTree.remove(removeName);
                     System.out.println("Contact removed (if it existed).");
                     break;
-                case 3:
+                case 3: // Display all contacts in alphabetical order
+
                     System.out.println("Contact List:");
                     contactsTree.printInOrder();
                     break;
-                case 4:
+                case 4:  // Search for a specific contact by name
+
                     System.out.print("Enter contact name to search: ");
                     String searchName = scanner.nextLine().trim();
                     Contact foundContact = contactsTree.search(searchName);
@@ -63,10 +69,12 @@ public class ContactsBST {
                         System.out.println("Contact not found.");
                     }
                     break;
-                case 5:
+                case 5: // Exit the program
+
                     System.out.println("Goodbye!");
                     return;
-                default:
+                default:  // Handle invalid menu input
+
                     System.out.println("Invalid selection. Please try again.");
             }
         }
